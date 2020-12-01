@@ -15,7 +15,8 @@ public class Particle : MonoBehaviour
     public float[] particleAngle;
     public float[] particleRadius;
     public float time = 0;
-
+    GameObject gameObject_;
+    bool move = true;
     public float speed = 0.15f;
     void Start()
     {
@@ -37,9 +38,9 @@ public class Particle : MonoBehaviour
             //float r = Random.Range(radius, 6.0f);
             float angle = Random.Range(0.0f, 360.0f);//位置为0 - 360度的随机一个角度
             float rad = angle / 180 * Mathf.PI;//角度变换成弧度
-            
-            particleRadius[i] += Mathf.PingPong(time, free) - free / 2.0f;  
-            time += Time.deltaTime; 
+
+            particleRadius[i] += Mathf.PingPong(time, free) - free / 2.0f;
+            time += Time.deltaTime;
 
             particleAngle[i] = angle;
             particleRadius[i] = r;
@@ -49,26 +50,46 @@ public class Particle : MonoBehaviour
     }
     void Update()
     {
-        for (int i = 0; i < particleNumber; i++)
+     //   Debug.Log(move);
+        if (move)
         {
-            //设置速度为五个不同的档次
-            if (i % 2 == 0)
+            for (int i = 0; i < particleNumber; i++)
             {
-                particleAngle[i] += speed * (i % 80 + 1);
+                //设置速度为五个不同的档次
+                if (i % 2 == 0)
+                {
+                    particleAngle[i] += speed * (i % 80 + 1);
+                }
+                else
+                {
+                    particleAngle[i] -= speed * (i % 80 + 1);
+                }
+                if (particleAngle[i] > 360)
+                    particleAngle[i] -= 360;
+                if (particleAngle[i] < 0)
+                    particleAngle[i] += 360;
+                float rad = particleAngle[i] / 180 * Mathf.PI;
+                particlesArray[i].position = new Vector3(particleRadius[i] * Mathf.Cos(rad), particleRadius[i] * Mathf.Sin(rad), 0f);
             }
-            else
-            {
-                particleAngle[i] -= speed * (i % 80 + 1);
-            }
-            if (particleAngle[i] > 360)
-                particleAngle[i] -= 360;
-            if (particleAngle[i] < 0)
-                particleAngle[i] += 360;
-            float rad = particleAngle[i] / 180 * Mathf.PI;
-            particlesArray[i].position = new Vector3(particleRadius[i] * Mathf.Cos(rad), particleRadius[i] * Mathf.Sin(rad), 0f);
+            particleSystem.SetParticles(particlesArray, particleNumber);
         }
-        particleSystem.SetParticles(particlesArray, particleNumber);
         //Debug.Log("111");
     }
 
+    private void OnMouseDown()
+    {
+       
+
+        if (move)
+        {
+            move = false;
+  
+        }
+        else
+        {
+            move = true;
+   
+        }
+
+    }
 }
